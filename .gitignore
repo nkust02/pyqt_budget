@@ -1,0 +1,31 @@
+cd C:\Users\陳麗雯\Desktop\程式設計期末專題\pyqt_budget
+
+# 建立新的 .gitignore
+@"
+# 虛擬環境
+venv/
+1202evn/
+v2/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# PyQt5 平台檔案
+platforms/
+
+# 資料庫
+*.db
+*.sqlite
+
+# 環境變數
+.env
+
+# 系統檔案
+.DS_Store
+Thumbs.db
+"@ | Out-File -Encoding UTF8 .gitignore
