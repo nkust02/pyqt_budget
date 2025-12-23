@@ -1,50 +1,20 @@
-from PyQt5.QtWidgets import QDialog, QLabel, QPushButton, QVBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QDialog, QLabel, QPushButton, QVBoxLayout
+from PyQt5.QtCore import Qt
 
 
 class MessageDialog(QDialog):
     """一般訊息對話窗"""
-    def __init__(self, title, message):
-        super().__init__()
-        self.setWindowTitle(title)
+    def __init__(self, title, message, parent=None):
+        super().__init__(parent)
+        # 移除標題列的「?」Help 按鈕
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+
+        # 純文字標題（不要 Emoji）
+        self.setWindowTitle(str(title))
+
         layout = QVBoxLayout()
-        layout.addWidget(QLabel(message))
-        btn = QPushButton("確定")
-        btn.clicked.connect(self.accept)
-        layout.addWidget(btn)
+        layout.addWidget(QLabel(str(message)))
+        ok_btn = QPushButton("確定")
+        ok_btn.clicked.connect(self.accept)
+        layout.addWidget(ok_btn)
         self.setLayout(layout)
-
-
-class ErrorDialog(QDialog):
-    """錯誤訊息對話窗"""
-    def __init__(self, title, error_msg):
-        super().__init__()
-        self.setWindowTitle(f"❌ {title}")
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel(f"錯誤：{error_msg}"))
-        btn = QPushButton("關閉")
-        btn.clicked.connect(self.accept)
-        layout.addWidget(btn)
-        self.setLayout(layout)
-
-
-class ConfirmDialog(QDialog):
-    """確認對話窗（Yes/No）"""
-    def __init__(self, title, message):
-        super().__init__()
-        self.setWindowTitle(f"❓ {title}")
-        self.result = False
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel(message))
-        
-        yes_btn = QPushButton("是")
-        yes_btn.clicked.connect(lambda: self._set_result(True))
-        no_btn = QPushButton("否")
-        no_btn.clicked.connect(lambda: self._set_result(False))
-        
-        layout.addWidget(yes_btn)
-        layout.addWidget(no_btn)
-        self.setLayout(layout)
-    
-    def _set_result(self, value):
-        self.result = value
-        self.accept()

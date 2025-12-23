@@ -1,16 +1,24 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from matplotlib.dates import DateFormatter, AutoDateLocator
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
-from datetime import datetime
+from datetime import datetime, date  # ✅ 新增匯入
 
-# ✅ 設定中文字體（使用系統字體）
+# ✅ 加入：Matplotlib 中文字型設定（用 Windows 內建）
 import matplotlib
-matplotlib.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei', 'DejaVu Sans']
-matplotlib.rcParams['axes.unicode_minus'] = False
+from matplotlib import font_manager
 
+# 依序嘗試可用字型（微軟正黑體/微軟雅黑/Arial Unicode）
+font_candidates = ["Microsoft JhengHei", "Microsoft YaHei", "Arial Unicode MS"]
+for fam in font_candidates:
+    try:
+        path = font_manager.findfont(fam, fallback_to_default=False)
+        if path:
+            matplotlib.rcParams["font.family"] = fam
+            matplotlib.rcParams["axes.unicode_minus"] = False
+            break
+    except Exception:
+        pass
+# 若以上都沒有，Matplotlib 仍會用預設字型，但中文可能是方塊
 
 class PlotWidget(QWidget):
     def __init__(self):
@@ -30,7 +38,8 @@ class PlotWidget(QWidget):
         
         if x and len(x) > 0:
             self.ax.set_xticks(x)
-            date_labels = [d.strftime('%m-%d') if isinstance(d, datetime) else str(d) for d in x]
+            # ✅ 同時支援 date/datetime
+            date_labels = [d.strftime('%m-%d') if isinstance(d, (datetime, date)) else str(d) for d in x]
             self.ax.set_xticklabels(date_labels, rotation=45, ha='right')
         
         self.ax.grid(True, alpha=0.3)

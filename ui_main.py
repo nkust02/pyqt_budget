@@ -61,8 +61,18 @@ class MainWindow(QWidget):
 
         # List and controls
         mid = QHBoxLayout()
+        
+        # 左側：清單 + 刪除按鈕
+        left_col = QVBoxLayout()
         self.list_widget = QListWidget()
-        mid.addWidget(self.list_widget)
+        left_col.addWidget(self.list_widget)
+        
+        # ✅ 加入刪除按鈕
+        self.delete_btn = QPushButton('刪除選中項目')
+        self.delete_btn.clicked.connect(self.delete_selected_item)
+        left_col.addWidget(self.delete_btn)
+        
+        mid.addLayout(left_col)
 
         right_col = QVBoxLayout()
         self.calculate_btn = QPushButton('計算')
@@ -158,23 +168,27 @@ class MainWindow(QWidget):
         try:
             # 先確認再刪除
             dialog = DialogFactory.create_confirm("刪除確認", "確定要刪除這筆記錄？")
-            if dialog.exec_() and dialog.result:
-                item = self.list_widget.item(row)
-                if item:
-                    # 解析顯示字串取得金額與日期
-                    text = item.text()
-                    kind, rest = text.split(': ', 1)
-                    name_cat, rest = rest.rsplit(' - ', 1)
-                    amount_text, date_text = rest.split('  ')
-                    amount = float(amount_text)
-                    date = QDate.fromString(date_text, 'yyyy-MM-dd')
-                    # 刪除資料
-                    self.data.delete_item(kind, name_cat, amount, date)
-                    # 刪除列表項目
+            dialog.exec_()
+            if dialog.result:
+                # ✅ 直接用索引刪除，不解析文字
+                if 0 <= row < len(self.data.items):
+                    del self.data.items[row]
                     self.list_widget.takeItem(row)
                     DialogFactory.create_message("成功", "資料已刪除").exec_()
+                    self.refresh_list()  # 重新整理清單
+                    self.update_chart()  # 更新圖表
+                else:
+                    DialogFactory.create_error("錯誤", "無效的項目索引").exec_()
         except Exception as e:
-            DialogFactory.create_error("錯誤", str(e)).exec_()
+            DialogFactory.create_error("刪除失敗", str(e)).exec_()
+
+    def delete_selected_item(self):
+        """刪除當前選中的項目"""
+        current_row = self.list_widget.currentRow()
+        if current_row >= 0:
+            self.delete_item(current_row)
+        else:
+            DialogFactory.create_error("錯誤", "請先選擇要刪除的項目").exec_()
 
     def refresh_list(self):
         """重新載入清單顯示所有項目"""
