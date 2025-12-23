@@ -41,7 +41,7 @@ python main.py
 | 元件 | 用途 |
 |------|------|
 | QLineEdit | 輸入金額、類別、備註 |
-| QPushButton | 新增、計算、清空等操作 |
+| QPushButton | 新增、計算、刪除、清空等操作 |
 | QComboBox | 選擇類別（食物、交通、娛樂等） |
 | QTableWidget | 顯示記錄列表 |
 | MatplotlibWidget | 折線圖（趨勢分析） |
@@ -53,6 +53,9 @@ pyqt_budget/
 ├── main.py              # 應用啟動進入點
 ├── ui_main.py           # 主視窗 UI 設計
 ├── dialogs.py           # 自訂對話窗
+├── plot_widget.py       # Matplotlib 圖表元件
+├── logic.py             # 資料與邏輯處理
+├── factories.py         # 工廠模式
 ├── requirements.txt     # 依賴清單
 ├── README.md            # 本檔案
 
@@ -66,14 +69,14 @@ pyqt_budget/
 
 ## 📝 功能說明
 
-### 收入/支出管理
-- 輸入日期、類別、金額、備註
-- 支持多種類別（收入/支出）
-- 資料以 list 儲存（可擴展為資料庫）
+### 資料管理
+- 使用 `BudgetItem` dataclass 儲存每筆記錄（kind、name、category、amount、when）
+- `BudgetData` 類別管理所有收支資料
+- 支援同一天多筆資料自動加總
 
 ### 計算與分析
 - 計算總收入、總支出、淨值
-- 按月份或類別統計
+- 按月份統計
 - Matplotlib 折線圖視覺化
 
 ### 錯誤處理
